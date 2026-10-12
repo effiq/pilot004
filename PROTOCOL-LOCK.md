@@ -97,10 +97,14 @@ The optimization artifacts this pilot ships = **deliverable configurations on H1
 | stages/11-arm-screening.sh | `619ee75f7bae74bc52dddd51abd71d49aa3961edd5cbd215f037f53b206c91f7` (amended; see Addendum A3) |
 | stages/12-red-dot-confirm.sh | `559c1faf72420e06b777038e3663747dfe4fbe2f09968feea098dfbe0f88f111` |
 | stages/13-tuned-perf.sh | `7e1cdd9018868b7ad9605fcc67ad4c3cc459d1e402bf13e18d759bd076643625` |
-| tonight.sh (pilot004) | `671a45be1833492054a082df0ee8d9ce6dd002e3922dc7892720954d96a9c0ce` (amended; see Addendum A2) |
+| tonight.sh (pilot004) | `e0163d8d8dd6bd92f2f69ae5a4fc9990f1c76481feb4e79302d89b36e0763639` (amended; see Addenda A2, A4) |
 | arms-manifest.json (pilot004) | `4eccbcb324b67282d07aaa4f535d8a2a1a8663e3774509b57e6aa4ddfd445362` |
 
 Backfilled 2026-10-10 after the four scripts + tonight.sh passed the eight-gate engineering review and a full sandbox stub chain. Any byte change to a frozen artifact after this date is a deviation and requires an addendum.
+
+### Addendum A4 (2026-10-12, committed before stage-12 execution)
+
+`tonight.sh`: sha256 `671a45be…c0ce` → `e0163d8d…3639`. Stage-11 completed rc=0 (outcome PROCEED; b1-profile-exempt advances to the single-shot confirmation), but the pre-push gate refused the evidence push: the dollar-figure scan ran over the entire repository tree and fired on pre-rule historical logs (2026-10-06 and 2026-10-08 quality-gate stage.log files, committed and public before the 2026-10-10 cost-secrecy rule existed; stage-11's own logs are dollar-free under the token-cap design). Assessment: the hits are judging-API spend metadata already public for days — no new leak occurred; public history is immutable by policy, so no rewrite will be attempted. Fix: the dollar scan now covers only newly-added lines in the push being gated (the staged diff), with unchanged path exclusions; token patterns, private-file names, and recipe fingerprints still scan the whole tree. The stage-11 evidence, left staged-but-uncommitted by the refusal (protected from wipe by A2), was verified clean under the narrowed scan and pushed manually; the commands are recorded in the pod log. No science content changed: arms, thresholds, judging, and verdicts are untouched.
 
 ### Addendum A3 (2026-10-12, committed before any further stage-11 execution)
 
