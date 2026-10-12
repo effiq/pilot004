@@ -94,13 +94,17 @@ The optimization artifacts this pilot ships = **deliverable configurations on H1
 | Artifact | sha256 |
 |---|---|
 | stages/10-preflight-calib.sh | `4e74b744d43a9bd2b9269ff6713ee354da14aefac416bc7304cdd5daf1a2c6f3` (amended; see Addendum A1) |
-| stages/11-arm-screening.sh | `171dd0ce6d50837bdd443c4fe4decca007989ca07aa0d0c9c8508bb39c40594e` |
+| stages/11-arm-screening.sh | `619ee75f7bae74bc52dddd51abd71d49aa3961edd5cbd215f037f53b206c91f7` (amended; see Addendum A3) |
 | stages/12-red-dot-confirm.sh | `559c1faf72420e06b777038e3663747dfe4fbe2f09968feea098dfbe0f88f111` |
 | stages/13-tuned-perf.sh | `7e1cdd9018868b7ad9605fcc67ad4c3cc459d1e402bf13e18d759bd076643625` |
 | tonight.sh (pilot004) | `671a45be1833492054a082df0ee8d9ce6dd002e3922dc7892720954d96a9c0ce` (amended; see Addendum A2) |
 | arms-manifest.json (pilot004) | `4eccbcb324b67282d07aaa4f535d8a2a1a8663e3774509b57e6aa4ddfd445362` |
 
 Backfilled 2026-10-10 after the four scripts + tonight.sh passed the eight-gate engineering review and a full sandbox stub chain. Any byte change to a frozen artifact after this date is a deviation and requires an addendum.
+
+### Addendum A3 (2026-10-12, committed before any further stage-11 execution)
+
+`stages/11-arm-screening.sh`: sha256 `171dd0ce…0594e` → `619ee75f…91f7`. The frozen exemption-selection rule (top-k ∪ over-threshold over per-module sensitivity) selected individual attention shards; vLLM fuses q/k/v (and gate/up) shards and requires a uniform scheme within each fused module, so the composed b1 checkpoint failed to serve (`model.layers.37.self_attn.qkv_proj` mixed scheme). Fix: after selection, expand to fused-module granularity — a selected shard implies its siblings. Selection method, k, θ, arms, thresholds, and judging are unchanged; the expanded set is recorded in the run archive. The incomplete stage-11 run_1 (b0 screening generations + stale recipe compositions) was discarded before ever being committed or pushed; the b1 checkpoint built from the stale recipe was deleted and will be rebuilt on resume. Same defect class as A1: the A1 fix covered the dry-run recipe but not this runtime composition path; both are now fuse-aware.
 
 ### Addendum A2 (2026-10-12, committed before stage-11 execution)
 
