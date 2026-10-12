@@ -1,0 +1,7 @@
+# runtime junk — never track (004 tooling: .gitignore 收运行时碎件)
+__pycache__/
+*.pyc
+*.log
+*.pid
+nohup.out
+.tmp/

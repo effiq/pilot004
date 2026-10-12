@@ -1,0 +1,68 @@
+{
+  "arms": [
+    {
+      "arm_id": "b0-control",
+      "lever_classes": [
+        "control-baseline"
+      ],
+      "recipe_sha256": "06a64e10a36249601107265b4e78836ca75061f0649c5034c5f5974ae88af60f",
+      "serve_extra": "--quantization fp8",
+      "uses_base_model": true,
+      "wave": 1
+    },
+    {
+      "arm_id": "b1-profile-exempt",
+      "lever_classes": [
+        "profile-driven-minimal-exemption:attention"
+      ],
+      "recipe_sha256": "composed-at-runtime-from-profile; recorded in run archive",
+      "serve_extra": "--quantization compressed-tensors",
+      "uses_base_model": false,
+      "wave": 1
+    },
+    {
+      "arm_id": "b2-smooth-exempt",
+      "lever_classes": [
+        "activation-smoothing",
+        "profile-driven-minimal-exemption:attention"
+      ],
+      "recipe_sha256": "composed-at-runtime-from-profile; recorded in run archive",
+      "serve_extra": "--quantization compressed-tensors",
+      "uses_base_model": false,
+      "wave": 1
+    },
+    {
+      "arm_id": "b3-a4-kv",
+      "lever_classes": [
+        "sensitive-layer-exemption:attention",
+        "kv-cache-fp8"
+      ],
+      "recipe_sha256": "9a443404b73f1e150ca1c7d5593e7d250207d13812c3a62ad09872cda9a06ce9",
+      "serve_extra": "--quantization compressed-tensors",
+      "uses_base_model": false,
+      "wave": 1
+    },
+    {
+      "arm_id": "b4-w2",
+      "lever_classes": [
+        "combo:top1+top2 (deterministic rule, see PROTOCOL-LOCK v3.0 sec.5)"
+      ],
+      "recipe_sha256": "composed-at-runtime; recorded in run archive",
+      "serve_extra": "--quantization compressed-tensors",
+      "uses_base_model": false,
+      "wave": 2
+    }
+  ],
+  "anchor_arm": {
+    "arm_id": "a4-anchor",
+    "lever_classes": [
+      "sensitive-layer-exemption:attention"
+    ],
+    "recipe_sha256": "10117c9db38b986a2e4508e2a784ace13e7d744365d1820f69a68cd841a5315d",
+    "note": "Pilot 003 winner rebuilt byte-identically on H100; descriptive anchor only, never gated",
+    "serve_extra": "--quantization compressed-tensors",
+    "uses_base_model": false
+  },
+  "pilot": "004",
+  "stage": "11-arm-screening"
+}
