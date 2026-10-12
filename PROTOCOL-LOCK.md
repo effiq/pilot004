@@ -97,10 +97,14 @@ The optimization artifacts this pilot ships = **deliverable configurations on H1
 | stages/11-arm-screening.sh | `171dd0ce6d50837bdd443c4fe4decca007989ca07aa0d0c9c8508bb39c40594e` |
 | stages/12-red-dot-confirm.sh | `559c1faf72420e06b777038e3663747dfe4fbe2f09968feea098dfbe0f88f111` |
 | stages/13-tuned-perf.sh | `7e1cdd9018868b7ad9605fcc67ad4c3cc459d1e402bf13e18d759bd076643625` |
-| tonight.sh (pilot004) | `979ac788a65dc22b1351c421b47e760cb6008ae07988a6f3bd6246be5c4bea72` |
+| tonight.sh (pilot004) | `671a45be1833492054a082df0ee8d9ce6dd002e3922dc7892720954d96a9c0ce` (amended; see Addendum A2) |
 | arms-manifest.json (pilot004) | `4eccbcb324b67282d07aaa4f535d8a2a1a8663e3774509b57e6aa4ddfd445362` |
 
 Backfilled 2026-10-10 after the four scripts + tonight.sh passed the eight-gate engineering review and a full sandbox stub chain. Any byte change to a frozen artifact after this date is a deviation and requires an addendum.
+
+### Addendum A2 (2026-10-12, committed before stage-11 execution)
+
+`tonight.sh`: sha256 `979ac788…ea72` → `671a45be…c0ce`. Root-cause analysis after stage-10's rc=0 found two tooling defects: (1) the pre-push leak scan false-fired on dry-run checkpoint **data** files (`config.json` carrying `kv_cache_scheme`, `generation_config.json` carrying `top_k`), aborting the commit and leaving evidence staged-but-uncommitted — the fingerprint scan now excludes `*.jsonl` data files, and the name-based private-file gate is unchanged; (2) `clone_or_pull` ran `git reset --hard origin/main` unconditionally, which wiped that staged evidence on the next launch — it now halts loudly on any unpushed local state. Separately, `pilot-logs` gained its first `.gitignore`: bulk reproducible artifacts (`**/dryrun/`, model binaries) are not pushed. The wiped stage-10 run_1 was recovered from dangling git blobs, restored byte-identical against recorded anchors, and re-verified (`--verify`: ALL CHECKS PASSED) before this amendment. No science content changed: thresholds, arms, grid, operating point, and recipes are untouched.
 
 ### Addendum A1 (2026-10-12, committed before any further stage-10 execution)
 
