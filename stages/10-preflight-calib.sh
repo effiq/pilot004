@@ -756,7 +756,9 @@ from llmcompressor import oneshot
 from llmcompressor.modifiers.quantization import QuantizationModifier
 mods = [QuantizationModifier(targets="Linear", scheme="FP8_DYNAMIC",
                              ignore=["lm_head", "embed_tokens",
-                                     "model.layers.0.self_attn.q_proj"])]
+                                     "model.layers.0.self_attn.q_proj",
+                                     "model.layers.0.self_attn.k_proj",
+                                     "model.layers.0.self_attn.v_proj"])]
 t0 = time.time()
 oneshot(model=os.environ["DRYRUN_MODEL"],
         dataset=_HFDS.from_list([{"text": t} for t in calib]),
