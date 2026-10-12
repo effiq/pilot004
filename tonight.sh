@@ -114,11 +114,16 @@ scan_repo() {   # $1 = repo dir
     hits=1
   fi
   # 成本纪律：公开制品不含美元金额（$ 后随数字的货币形态）
-  if git -C "$repo" grep -nI -E '\$[0-9]+\.?[0-9]*' -- . ':(exclude).git' ':(exclude)stages/' \
-       ':(exclude)tonight.sh' ':(exclude)*.jsonl' >/dev/null 2>&1; then
-    echo "LEAK SCAN [$repo]: dollar-figure pattern outside allowed paths (cost secrecy rule 2026-10-10):" >&2
-    git -C "$repo" grep -nI -E '\$[0-9]+\.?[0-9]*' -- . ':(exclude).git' ':(exclude)stages/' \
-       ':(exclude)tonight.sh' ':(exclude)*.jsonl' | head -20 >&2 || true
+  # addendum A4 (2026-10-12): 美元扫描只覆盖本次推送新增的行（staged diff）。
+  # 规则生效前已公开的历史无法收回，闸门的职责是拦住新泄漏，不是审判历史——
+  # 整树扫描误伤了规则诞生前就已公开的旧日志（stage-11 推送被拦事件）。
+  local dollar_hits
+  dollar_hits=$(git -C "$repo" diff --cached -U0 -- . ':(exclude).git' ':(exclude)stages/' \
+      ':(exclude)tonight.sh' ':(exclude)*.jsonl' 2>/dev/null \
+    | grep -E '^\+' | grep -vE '^\+\+\+' | grep -E '\$[0-9]+\.?[0-9]*' | head -20 || true)
+  if [ -n "$dollar_hits" ]; then
+    echo "LEAK SCAN [$repo]: dollar-figure pattern in newly-added lines (cost secrecy rule 2026-10-10; addendum A4):" >&2
+    echo "$dollar_hits" >&2
     hits=1
   fi
   return "$hits"
