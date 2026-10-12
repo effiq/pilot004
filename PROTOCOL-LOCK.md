@@ -93,7 +93,7 @@ The optimization artifacts this pilot ships = **deliverable configurations on H1
 
 | Artifact | sha256 |
 |---|---|
-| stages/10-preflight-calib.sh | `ad6710ae886c89f178de716690f9ae3259330ae90b07fecd79a8ad92265da031` |
+| stages/10-preflight-calib.sh | `4e74b744d43a9bd2b9269ff6713ee354da14aefac416bc7304cdd5daf1a2c6f3` (amended; see Addendum A1) |
 | stages/11-arm-screening.sh | `171dd0ce6d50837bdd443c4fe4decca007989ca07aa0d0c9c8508bb39c40594e` |
 | stages/12-red-dot-confirm.sh | `559c1faf72420e06b777038e3663747dfe4fbe2f09968feea098dfbe0f88f111` |
 | stages/13-tuned-perf.sh | `7e1cdd9018868b7ad9605fcc67ad4c3cc459d1e402bf13e18d759bd076643625` |
@@ -101,6 +101,10 @@ The optimization artifacts this pilot ships = **deliverable configurations on H1
 | arms-manifest.json (pilot004) | `4eccbcb324b67282d07aaa4f535d8a2a1a8663e3774509b57e6aa4ddfd445362` |
 
 Backfilled 2026-10-10 after the four scripts + tonight.sh passed the eight-gate engineering review and a full sandbox stub chain. Any byte change to a frozen artifact after this date is a deviation and requires an addendum.
+
+### Addendum A1 (2026-10-12, committed before any further stage-10 execution)
+
+`stages/10-preflight-calib.sh`: sha256 `ad6710ae…da031` → `4e74b744…c6f3`. The dry-run mini-recipe exempted only `model.layers.0.self_attn.q_proj`; vLLM fuses q/k/v into qkv_proj and requires a uniform scheme across fused shards, so the dry-run server could never start. Fix: exempt the full layer-0 q/k/v set (fused-granularity exemption). Science content unchanged: thresholds, arms, grid, anchors, and the three real recipes (all verified fused-safe on 2026-10-12) are untouched. This deviation was caught by the built-in dry-run phase exactly as designed.
 
 ## 11. Execution commitments (004 tooling list, part of the frozen text)
 
