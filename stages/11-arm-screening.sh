@@ -576,6 +576,20 @@ print(f"selection: top_k={k}, theta={theta:.6f} ({mult}x median {med:.6f}); exem
       f"(top-k {len(topk)} + over-threshold {len(over)} - overlap {len(topk & over)})")
 if not exempt:
     sys.exit("FATAL: exemption set empty — H1 has no signal; owner decision required")
+# addendum A3 (2026-10-12): expand selection to fused-module granularity —
+# vLLM fuses q/k/v (and gate/up) shards and requires a uniform scheme within
+# each fused module, so exempting one shard implies exempting its siblings.
+def _expand_fused(mods):
+    out = set(mods)
+    for m in mods:
+        for grp in (("q_proj", "k_proj", "v_proj"), ("gate_proj", "up_proj")):
+            for shard in grp:
+                if m.endswith("." + shard):
+                    base = m[: -len(shard)]
+                    out.update(base + s for s in grp)
+    return sorted(out)
+exempt = _expand_fused(exempt)
+print(f"fused-granularity expansion (A3): exemption set now {len(exempt)} modules")
 ignore = ["lm_head", "embed_tokens"] + exempt
 calib = {"max_seq_len": 2048, "n_samples": 256, "seed": 20261015}
 b1 = {"arm_id": "b1-profile-exempt", "builder": "llmcompressor-oneshot",
