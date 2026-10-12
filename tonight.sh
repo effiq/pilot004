@@ -62,6 +62,10 @@ clone_or_pull() {   # $1 = url, $2 = dir
     # 历史克隆若未内嵌凭证，原地修复 remote（防交互卡死）
     git -C "$dir" remote set-url origin "https://x-access-token:${TOKEN}@${url#https://}"
     git -C "$dir" fetch origin
+    # addendum A2 (2026-10-12): never wipe unpushed local state — halt loudly instead
+    if [ -n "$(git -C "$dir" status --porcelain)" ] || [ "$(git -C "$dir" rev-parse HEAD)" != "$(git -C "$dir" rev-parse origin/main)" ]; then
+      die "LOCAL UNPUSHED STATE in $dir — refusing reset --hard (addendum A2). Push or clean manually, then re-run."
+    fi
     git -C "$dir" reset --hard origin/main
   fi
 }
@@ -101,12 +105,12 @@ scan_repo() {   # $1 = repo dir
     git -C "$repo" ls-files | grep -E '(^|/)arms-recipes\.json$|recipes-local\.jsonl$|(^|/)profile\.json$' >&2 || true
     hits=1
   fi
-  # 配方参数指纹（stages/ 与 tonight.sh 是公开件，类名合法；查的是数据文件本体）
+  # 配方参数指纹（stages/ 与 tonight.sh 是公开件，类名合法；查的是数据文件本体；jsonl 为数据文件豁免——addendum A2）
   if git -C "$repo" grep -nI -E '"smoothing_strength"|"scheme_overrides"|"kv_cache_scheme"|"top_k"|"theta_mult"|"mse_rel"' \
-       -- . ':(exclude).git' ':(exclude)stages/' ':(exclude)tonight.sh' >/dev/null 2>&1; then
+       -- . ':(exclude).git' ':(exclude)stages/' ':(exclude)tonight.sh' ':(exclude)*.jsonl' >/dev/null 2>&1; then
     echo "LEAK SCAN [$repo]: private recipe/profile fingerprints outside stages/:" >&2
     git -C "$repo" grep -nI -E '"smoothing_strength"|"scheme_overrides"|"kv_cache_scheme"|"top_k"|"theta_mult"|"mse_rel"' \
-       -- . ':(exclude).git' ':(exclude)stages/' ':(exclude)tonight.sh' | head -20 >&2 || true
+       -- . ':(exclude).git' ':(exclude)stages/' ':(exclude)tonight.sh' ':(exclude)*.jsonl' | head -20 >&2 || true
     hits=1
   fi
   # 成本纪律：公开制品不含美元金额（$ 后随数字的货币形态）
