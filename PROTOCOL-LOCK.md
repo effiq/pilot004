@@ -88,6 +88,7 @@ The optimization artifacts this pilot ships = **deliverable configurations on H1
 - Within 7 days of the verdict: publish VERDICT.md + REPRODUCE.md; a FAIL is published in full, identically.
 - The public repo effiq/pilot004 is built starting on the freeze date; logs keep flowing to pilot-logs (automatic push via tonight.sh, landing from 004).
 - Public artifacts carry no cost figures; lever-category labels and recipe sha256 are public; recipe bodies are gate-layer, pod-only (three-layer disclosure policy unchanged).
+- **Publication record (2026-10-13)**: VERDICT.md + REPRODUCE.md published to effiq/pilot004 on verdict day (window day 1 of 7); remote git blobs verified byte-identical to the reviewed masters (blob sha1 `590a0ac3…08de0`, `ea9c39a8…49ec`). Companion publication: essay-004 (zh+en) pushed to effiq/essays the same day (blob sha1 `8b3614af…b64b`, `8e8b7590…c77f`).
 
 ## 10. Frozen artifacts (hash record)
 
